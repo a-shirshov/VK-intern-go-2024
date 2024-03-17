@@ -1,0 +1,290 @@
+basePath: /
+consumes:
+    - application/json
+definitions:
+    ActorRequest:
+        properties:
+            dateOfBirth:
+                description: Date of birth of the actor
+                type: string
+                x-go-name: DateOfBirth
+            gender:
+                description: Gender of the actor
+                type: string
+                x-go-name: Gender
+            name:
+                description: Name of the actor
+                type: string
+                x-go-name: Name
+        required:
+            - name
+            - gender
+            - dateOfBirth
+        type: object
+        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+    BasicResponse:
+        properties:
+            status:
+                type: string
+                x-go-name: Status
+        type: object
+        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+    FilmRequest:
+        properties:
+            description:
+                description: Description of film
+                type: string
+                x-go-name: Description
+            rating:
+                description: Rating of the film
+                format: int64
+                type: integer
+                x-go-name: Rating
+            release_date:
+                description: Release date of film
+                example: "2023-03-17"
+                type: string
+                x-go-name: ReleaseDate
+            title:
+                description: Name of the actor
+                type: string
+                x-go-name: Title
+        required:
+            - title
+            - description
+            - release_date
+            - rating
+        type: object
+        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+    actor:
+        description: Actor represents actor in system
+        properties:
+            dateOfBirth:
+                description: Date of birth of the actor
+                type: string
+                x-go-name: DateOfBirth
+            gender:
+                description: Gender of the actor
+                type: string
+                x-go-name: Gender
+            id:
+                description: The id for this actor
+                format: int64
+                minimum: 1
+                type: integer
+                x-go-name: ID
+            name:
+                description: Name of the actor
+                type: string
+                x-go-name: Name
+        required:
+            - name
+            - gender
+            - dateOfBirth
+            - id
+        type: object
+        x-go-name: Actor
+        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+    film:
+        description: Film represents film in system
+        properties:
+            description:
+                description: Description of film
+                type: string
+                x-go-name: Description
+            id:
+                description: The id for this film
+                format: int64
+                minimum: 1
+                type: integer
+                x-go-name: ID
+            rating:
+                description: Rating of the film
+                format: int64
+                type: integer
+                x-go-name: Rating
+            release_date:
+                description: Release date of film
+                example: "2023-03-17"
+                type: string
+                x-go-name: ReleaseDate
+            title:
+                description: Name of the actor
+                type: string
+                x-go-name: Title
+        required:
+            - title
+            - description
+            - release_date
+            - rating
+        type: object
+        x-go-name: Film
+        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+    filmWithActors:
+        description: To add film in a system. Film and actors list
+        properties:
+            actors:
+                items:
+                    type: string
+                type: array
+                x-go-name: Actors
+            description:
+                description: Description of film
+                type: string
+                x-go-name: Description
+            rating:
+                description: Rating of the film
+                format: int64
+                type: integer
+                x-go-name: Rating
+            release_date:
+                description: Release date of film
+                example: "2023-03-17"
+                type: string
+                x-go-name: ReleaseDate
+            title:
+                description: Name of the actor
+                type: string
+                x-go-name: Title
+        required:
+            - title
+            - description
+            - release_date
+            - rating
+        type: object
+        x-go-name: FilmWithActorsRequest
+        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+info:
+    description: '# Documentation for Actor API'
+    title: Actor API
+    version: 1.0.0
+paths:
+    /actors:
+        post:
+            description: Returns a status of operation adding an actor
+            operationId: addActor
+            responses:
+                "200":
+                    $ref: '#/responses/basicResponse'
+                "400":
+                    $ref: '#/responses/basicResponse'
+            tags:
+                - Actors
+    /actors/{id}:
+        delete:
+            description: Deletes actor by id
+            operationId: deleteActor
+            parameters:
+                - description: Actor from database
+                  in: body
+                  name: Body
+                  schema:
+                    $ref: '#/definitions/actor'
+            responses:
+                "200":
+                    $ref: '#/responses/basicResponse'
+                "400":
+                    $ref: '#/responses/basicResponse'
+                "500":
+                    $ref: '#/responses/basicResponse'
+            tags:
+                - Actors
+        put:
+            description: Updates actor by id
+            operationId: updateActor
+            parameters:
+                - description: The id of actor
+                  format: int64
+                  in: path
+                  name: ID
+                  required: true
+                  type: integer
+                - description: Actor from database
+                  in: body
+                  name: Body
+                  schema:
+                    $ref: '#/definitions/actor'
+            responses:
+                "200":
+                    $ref: '#/responses/basicResponse'
+                "400":
+                    $ref: '#/responses/basicResponse'
+                "500":
+                    $ref: '#/responses/basicResponse'
+            tags:
+                - Actors
+    /films:
+        post:
+            description: Returns a status of operation adding an film
+            operationId: addFilm
+            parameters:
+                - description: Film with actors
+                  in: body
+                  name: Body
+                  schema:
+                    $ref: '#/definitions/filmWithActors'
+            responses:
+                "200":
+                    $ref: '#/responses/basicResponse'
+            tags:
+                - Films
+    /films/{id}:
+        delete:
+            description: Updates film by id
+            operationId: deleteFilm
+            parameters:
+                - description: The id of film
+                  format: int64
+                  in: path
+                  name: id
+                  required: true
+                  type: integer
+                  x-go-name: ID
+            responses:
+                "200":
+                    $ref: '#/responses/basicResponse'
+                "400":
+                    $ref: '#/responses/basicResponse'
+                "500":
+                    $ref: '#/responses/basicResponse'
+            tags:
+                - Films
+        put:
+            description: Updates film by id
+            operationId: updateFilm
+            parameters:
+                - description: Film
+                  in: body
+                  name: Body
+                  schema:
+                    $ref: '#/definitions/film'
+                - description: The id of film
+                  format: int64
+                  in: path
+                  name: id
+                  required: true
+                  type: integer
+                  x-go-name: ID
+            responses:
+                "200":
+                    $ref: '#/responses/basicResponse'
+                "400":
+                    $ref: '#/responses/basicResponse'
+                "500":
+                    $ref: '#/responses/basicResponse'
+            tags:
+                - Films
+produces:
+    - application/json
+responses:
+    actor:
+        description: An actor from database
+        schema:
+            $ref: '#/definitions/actor'
+    basicResponse:
+        description: 'Basic response: Good - OK. Else - Error'
+        schema:
+            $ref: '#/definitions/BasicResponse'
+schemes:
+    - http
+swagger: "2.0"
