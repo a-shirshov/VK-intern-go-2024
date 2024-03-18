@@ -4,6 +4,7 @@ go 1.21.3
 
 require (
 	github.com/go-openapi/runtime v0.28.0
+	github.com/golang/mock v1.6.0
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/pashagolub/pgxmock/v3 v3.3.0
 	github.com/sirupsen/logrus v1.9.3

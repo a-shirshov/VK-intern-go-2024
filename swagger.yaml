@@ -4,40 +4,46 @@ consumes:
 definitions:
     ActorRequest:
         properties:
-            dateOfBirth:
+            date_of_birth:
                 description: Date of birth of the actor
+                example: "2001-08-06"
                 type: string
                 x-go-name: DateOfBirth
             gender:
                 description: Gender of the actor
+                example: Мужской
                 type: string
                 x-go-name: Gender
             name:
                 description: Name of the actor
+                example: Леонардо Ди Каприо
                 type: string
                 x-go-name: Name
         required:
             - name
             - gender
-            - dateOfBirth
+            - date_of_birth
         type: object
-        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+        x-go-package: _/home/artyom/Self_Learning/VK-intern-go-2024/models
     BasicResponse:
         properties:
             status:
                 type: string
                 x-go-name: Status
         type: object
-        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+        x-go-package: _/home/artyom/Self_Learning/VK-intern-go-2024/models
     FilmRequest:
         properties:
             description:
                 description: Description of film
+                example: film_description
                 type: string
                 x-go-name: Description
             rating:
                 description: Rating of the film
+                example: 7
                 format: int64
+                maximum: 10
                 type: integer
                 x-go-name: Rating
             release_date:
@@ -47,6 +53,7 @@ definitions:
                 x-go-name: ReleaseDate
             title:
                 description: Name of the actor
+                example: Titanic
                 type: string
                 x-go-name: Title
         required:
@@ -55,16 +62,18 @@ definitions:
             - release_date
             - rating
         type: object
-        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+        x-go-package: _/home/artyom/Self_Learning/VK-intern-go-2024/models
     actor:
         description: Actor represents actor in system
         properties:
-            dateOfBirth:
+            date_of_birth:
                 description: Date of birth of the actor
+                example: "2001-08-06"
                 type: string
                 x-go-name: DateOfBirth
             gender:
                 description: Gender of the actor
+                example: Мужской
                 type: string
                 x-go-name: Gender
             id:
@@ -75,21 +84,60 @@ definitions:
                 x-go-name: ID
             name:
                 description: Name of the actor
+                example: Леонардо Ди Каприо
                 type: string
                 x-go-name: Name
         required:
             - name
             - gender
-            - dateOfBirth
+            - date_of_birth
             - id
         type: object
         x-go-name: Actor
-        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+        x-go-package: _/home/artyom/Self_Learning/VK-intern-go-2024/models
+    actorWithFilms:
+        description: Actor with films in which playing
+        properties:
+            date_of_birth:
+                description: Date of birth of the actor
+                example: "2001-08-06"
+                type: string
+                x-go-name: DateOfBirth
+            films:
+                items:
+                    $ref: '#/definitions/film'
+                type: array
+                x-go-name: Films
+            gender:
+                description: Gender of the actor
+                example: Мужской
+                type: string
+                x-go-name: Gender
+            id:
+                description: The id for this actor
+                format: int64
+                minimum: 1
+                type: integer
+                x-go-name: ID
+            name:
+                description: Name of the actor
+                example: Леонардо Ди Каприо
+                type: string
+                x-go-name: Name
+        required:
+            - name
+            - gender
+            - date_of_birth
+            - id
+        type: object
+        x-go-name: ActorWithFilms
+        x-go-package: _/home/artyom/Self_Learning/VK-intern-go-2024/models
     film:
         description: Film represents film in system
         properties:
             description:
                 description: Description of film
+                example: film_description
                 type: string
                 x-go-name: Description
             id:
@@ -100,7 +148,9 @@ definitions:
                 x-go-name: ID
             rating:
                 description: Rating of the film
+                example: 7
                 format: int64
+                maximum: 10
                 type: integer
                 x-go-name: Rating
             release_date:
@@ -110,6 +160,7 @@ definitions:
                 x-go-name: ReleaseDate
             title:
                 description: Name of the actor
+                example: Titanic
                 type: string
                 x-go-name: Title
         required:
@@ -119,7 +170,7 @@ definitions:
             - rating
         type: object
         x-go-name: Film
-        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+        x-go-package: _/home/artyom/Self_Learning/VK-intern-go-2024/models
     filmWithActors:
         description: To add film in a system. Film and actors list
         properties:
@@ -130,11 +181,14 @@ definitions:
                 x-go-name: Actors
             description:
                 description: Description of film
+                example: film_description
                 type: string
                 x-go-name: Description
             rating:
                 description: Rating of the film
+                example: 7
                 format: int64
+                maximum: 10
                 type: integer
                 x-go-name: Rating
             release_date:
@@ -144,6 +198,7 @@ definitions:
                 x-go-name: ReleaseDate
             title:
                 description: Name of the actor
+                example: Titanic
                 type: string
                 x-go-name: Title
         required:
@@ -153,53 +208,85 @@ definitions:
             - rating
         type: object
         x-go-name: FilmWithActorsRequest
-        x-go-package: _/home/artyom/go_tests/vk-intern_test-case/models
+        x-go-package: _/home/artyom/Self_Learning/VK-intern-go-2024/models
 info:
-    description: '# Documentation for Actor API'
-    title: Actor API
+    description: '# Documentation for VK-Intern 2024 Ширшов Артём'
+    title: VK-Intern 2024
     version: 1.0.0
 paths:
     /actors:
-        post:
-            description: Returns a status of operation adding an actor
-            operationId: addActor
+        get:
+            operationId: getActors
             responses:
                 "200":
+                    description: actorWithFilms
+                    schema:
+                        items:
+                            $ref: '#/definitions/actorWithFilms'
+                        type: array
+                "500":
                     $ref: '#/responses/basicResponse'
+            summary: Возращает список актёров с их фильмами.
+            tags:
+                - Actors
+        post:
+            description: Добавляет актёра в систему
+            operationId: addActor
+            parameters:
+                - description: Данные о актёре
+                  in: body
+                  name: Body
+                  schema:
+                    $ref: '#/definitions/ActorRequest'
+            responses:
+                "200":
+                    $ref: '#/responses/actor'
                 "400":
                     $ref: '#/responses/basicResponse'
+                "401":
+                    $ref: '#/responses/basicResponse'
+                "500":
+                    $ref: '#/responses/basicResponse'
+            security:
+                - key: []
             tags:
                 - Actors
     /actors/{id}:
         delete:
-            description: Deletes actor by id
             operationId: deleteActor
             parameters:
-                - description: Actor from database
-                  in: body
-                  name: Body
-                  schema:
-                    $ref: '#/definitions/actor'
+                - description: ID актёра
+                  format: int64
+                  in: path
+                  name: id
+                  required: true
+                  type: integer
+                  x-go-name: ID
             responses:
                 "200":
                     $ref: '#/responses/basicResponse'
                 "400":
                     $ref: '#/responses/basicResponse'
+                "401":
+                    $ref: '#/responses/basicResponse'
                 "500":
                     $ref: '#/responses/basicResponse'
+            security:
+                - key: []
+            summary: Удаляет актёра из системы.
             tags:
                 - Actors
         put:
-            description: Updates actor by id
             operationId: updateActor
             parameters:
-                - description: The id of actor
+                - description: ID актёра
                   format: int64
                   in: path
-                  name: ID
+                  name: id
                   required: true
                   type: integer
-                - description: Actor from database
+                  x-go-name: ID
+                - description: Данные об актёре
                   in: body
                   name: Body
                   schema:
@@ -209,16 +296,67 @@ paths:
                     $ref: '#/responses/basicResponse'
                 "400":
                     $ref: '#/responses/basicResponse'
+                "401":
+                    $ref: '#/responses/basicResponse'
+                "500":
+                    $ref: '#/responses/basicResponse'
+            security:
+                - key: []
+            summary: Обновляет информацию об актёре. На вход полная информация.
+            tags:
+                - Actors
+    /film:
+        get:
+            description: Возвращает список фильмов по фрагменту названия или фрагмена имени актёра
+            operationId: getFilm
+            parameters:
+                - description: Поиск по фрагменту названия
+                  in: query
+                  name: title
+                  type: string
+                  x-go-name: Title
+                - description: Поиск по фрагменту имени актёра
+                  in: query
+                  name: actor
+                  type: string
+                  x-go-name: Actor
+            responses:
+                "200":
+                    description: film
+                    schema:
+                        items:
+                            $ref: '#/definitions/film'
+                        type: array
                 "500":
                     $ref: '#/responses/basicResponse'
             tags:
-                - Actors
+                - Films
     /films:
+        get:
+            description: Возвращает список фильмов. Можно указать поле для сортировки, по умолчанию - по рейтингу
+            operationId: getFilms
+            parameters:
+                - description: Параметр для сортировки. Возможные поля - rating, title, release_date
+                  in: query
+                  name: sort_by
+                  type: string
+                  x-go-name: SortBy
+            responses:
+                "200":
+                    description: film
+                    schema:
+                        items:
+                            $ref: '#/definitions/film'
+                        type: array
+                "500":
+                    $ref: '#/responses/basicResponse'
+            tags:
+                - Films
         post:
-            description: Returns a status of operation adding an film
+            description: "Добавляет новый фильм в систему, совместно со списком актёров. \nЕсли актёра нет в базе - он пропускается и не записывается.\nАктёр добавляется заранее. Поиск происходит по имени."
             operationId: addFilm
             parameters:
-                - description: Film with actors
+                - description: Данные об фильме с актёрами
                   in: body
                   name: Body
                   schema:
@@ -226,14 +364,18 @@ paths:
             responses:
                 "200":
                     $ref: '#/responses/basicResponse'
+                "401":
+                    $ref: '#/responses/basicResponse'
+            security:
+                - key: []
             tags:
                 - Films
     /films/{id}:
         delete:
-            description: Updates film by id
+            description: Удаляет фильм из системы
             operationId: deleteFilm
             parameters:
-                - description: The id of film
+                - description: ID фильма
                   format: int64
                   in: path
                   name: id
@@ -245,20 +387,23 @@ paths:
                     $ref: '#/responses/basicResponse'
                 "400":
                     $ref: '#/responses/basicResponse'
+                "401":
+                    $ref: '#/responses/basicResponse'
                 "500":
                     $ref: '#/responses/basicResponse'
+            security:
+                - key: []
             tags:
                 - Films
         put:
-            description: Updates film by id
             operationId: updateFilm
             parameters:
-                - description: Film
+                - description: Данные о фильме
                   in: body
                   name: Body
                   schema:
                     $ref: '#/definitions/film'
-                - description: The id of film
+                - description: ID фильма
                   format: int64
                   in: path
                   name: id
@@ -270,8 +415,13 @@ paths:
                     $ref: '#/responses/basicResponse'
                 "400":
                     $ref: '#/responses/basicResponse'
+                "401":
+                    $ref: '#/responses/basicResponse'
                 "500":
                     $ref: '#/responses/basicResponse'
+            security:
+                - key: []
+            summary: Обновляет информацию о фильме, на вход полный поступает вся информация о фильме.
             tags:
                 - Films
 produces:
@@ -282,9 +432,14 @@ responses:
         schema:
             $ref: '#/definitions/actor'
     basicResponse:
-        description: 'Basic response: Good - OK. Else - Error'
+        description: Ответ системы. В случае успеха - ОК. Иначе описание ошибки
         schema:
             $ref: '#/definitions/BasicResponse'
 schemes:
     - http
+securityDefinitions:
+    key:
+        in: header
+        name: Authorization
+        type: apiKey
 swagger: "2.0"

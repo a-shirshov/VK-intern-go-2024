@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS actor (
 
 CREATE TABLE IF NOT EXISTS film (
     id serial not null unique,
-    name text not null,
+    title text not null,
     description text not null,
     release_date date not null,
     rating smallint not null
@@ -20,3 +20,11 @@ CREATE TABLE IF NOT EXISTS actor_film (
     FOREIGN KEY (actor_id) REFERENCES actor (id) on delete cascade,
     FOREIGN KEY (film_id) REFERENCES film (id) on delete cascade
 );
+
+CREATE TABLE IF NOT EXISTS service_user (
+    id serial not null unique,
+    role text default 'Пользователь'
+);
+
+INSERT INTO service_user (role) values ('Пользователь');
+INSERT INTO service_user (role) values ('Администратор');

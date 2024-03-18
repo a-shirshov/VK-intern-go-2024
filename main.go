@@ -1,6 +1,6 @@
-// Package classification Actor API
+// Package classification VK-Intern 2024
 //
-// # Documentation for Actor API
+// # Documentation for VK-Intern 2024 Ширшов Артём
 //
 // Schemes: http
 // BasePath: /
@@ -10,6 +10,12 @@
 // - application/json
 // Produces:
 // - application/json
+// SecurityDefinitions:
+//  key:
+//   type: apiKey
+//   in: header
+//   name: Authorization
+//
 // swagger:meta
 package main
 
@@ -17,6 +23,7 @@ import (
 	"net/http"
 	actorDelivery "vk-intern_test-case/internal/actor/delivery"
 	actorRepository "vk-intern_test-case/internal/actor/repository"
+	"vk-intern_test-case/internal/middleware"
 	"vk-intern_test-case/utils/database"
 
 	log "github.com/sirupsen/logrus"
@@ -24,7 +31,7 @@ import (
 	filmDelivery "vk-intern_test-case/internal/film/delivery"
 	filmRepository "vk-intern_test-case/internal/film/repository"
 
-	"github.com/go-openapi/runtime/middleware"
+	openApiMiddleware "github.com/go-openapi/runtime/middleware"
 )
 
 func main() {
@@ -44,15 +51,21 @@ func main() {
 	aR := actorRepository.NewActorRepository(dbPool)
 	aD := actorDelivery.NewActorDelivery(aR)
 
-	r := http.NewServeMux()
-	r.HandleFunc("/actors", aD.AddActor)
-	r.HandleFunc("/actors/", aD.HandleActor)
-	
-	r.HandleFunc("/films", fD.AddFilm)
-	r.HandleFunc("/films/", fD.HandleFilm)
+	authMw := middleware.NewAuthMiddleware(dbPool)
 
-	opts := middleware.SwaggerUIOpts{SpecURL: "/swagger.yaml"}
-	sh := middleware.SwaggerUI(opts, nil)
+	r := http.NewServeMux()
+	actorsHandler := http.HandlerFunc(aD.HandleActors)
+	r.Handle("/actors", authMw.MiddlewareCheckAdmin(actorsHandler))
+	r.Handle("/actors/", authMw.MiddlewareCheckAdmin(actorsHandler))
+
+	filmsHandler := http.HandlerFunc(fD.HandleFilms)
+	r.Handle("/films", authMw.MiddlewareCheckAdmin(filmsHandler))
+	r.Handle("/films/", authMw.MiddlewareCheckAdmin(filmsHandler))
+
+	r.HandleFunc("/film", fD.HandleFilm)
+
+	opts := openApiMiddleware.SwaggerUIOpts{SpecURL: "/swagger.yaml"}
+	sh := openApiMiddleware.SwaggerUI(opts, nil)
 	r.Handle("/docs", sh)
 	r.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 

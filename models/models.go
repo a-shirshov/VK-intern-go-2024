@@ -19,34 +19,44 @@ type ActorRequest struct {
 	// Name of the actor
 	//
 	// required: true
+	// example: Леонардо Ди Каприо
 	Name string `json:"name"`
 	// Gender of the actor
 	//
 	// required: true
+	// example: Мужской
 	Gender string `json:"gender"`
 	// Date of birth of the actor
 	//
 	// required: true
-	DateOfBirth string `json:"dateOfBirth"`
+	// В формате YYYY-MM_DD
+	// example: 2001-08-06
+	DateOfBirth string `json:"date_of_birth"`
 }
 
 type FilmRequest struct {
 	// Name of the actor
 	//
 	// required: true
+	// example: Titanic
 	Title string `json:"title"`
 	// Description of film
 	//
 	// required: true
+	// example: film_description
 	Description string `json:"description"`
 	// Release date of film
 	//
 	// required: true
+	// В формате YYYY-MM_DD
 	// example: 2023-03-17
 	ReleaseDate string `json:"release_date"`
 	// Rating of the film
 	//
 	// required: true
+	// minimun: 0
+	// maximum: 10
+	// example: 7
 	Rating int `json:"rating"`
 }
 
@@ -60,14 +70,14 @@ type Film struct {
 	FilmRequest
 }
 
-// To add film in a system. Film and actors list
-// swagger:model filmWithActors
-type FilmWithActorsRequest struct {
-	FilmRequest
-	Actors []string `json:"actors"`
-}
-
 type FilmWithActors struct {
 	Film
 	Actors []string `json:"actors"`
+}
+
+// Actor with films in which playing
+// swagger:model actorWithFilms
+type ActorWithFilms struct {
+	Actor
+	Films []Film `json:"films"`
 }

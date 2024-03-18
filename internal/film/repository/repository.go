@@ -2,12 +2,14 @@ package repository
 
 import (
 	"context"
+	"time"
 	actorQueries "vk-intern_test-case/internal/actor/queries"
 	filmQueries "vk-intern_test-case/internal/film/queries"
 	"vk-intern_test-case/models"
 	"vk-intern_test-case/utils/database"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -123,7 +125,7 @@ func (fR *FilmRepository) DeleteFilm(filmID int) error {
 	return nil
 }
 
-func (fR *FilmRepository) GetFilmsSortedByRating() ([]models.Film, error) {
+func (fR *FilmRepository) GetFilmsSorted(field string) ([]models.Film, error) {
 	transactionCtx := context.Background()
 	tx, err := fR.pool.Begin(transactionCtx)
 	if err != nil {
@@ -139,94 +141,28 @@ func (fR *FilmRepository) GetFilmsSortedByRating() ([]models.Film, error) {
 		}
 	}()
 
+	query := filmQueries.GetFilmsSortedByRating
+	switch field {
+	case "release_date":
+		query = filmQueries.GetFilmsSortedByDate
+	case "title":
+		query = filmQueries.GetFilmsSortedByTitle
+	}
+
 	films := []models.Film{}
-	rows, err := tx.Query(transactionCtx, filmQueries.GetFilmsSortedByRating)
+	rows, err := tx.Query(transactionCtx, query)
 	if err != nil {
 		return []models.Film{}, err
 	}
 
 	for rows.Next() {
 		film := models.Film{}
-		err := rows.Scan(&film.ID, &film.Title, &film.Description, &film.ReleaseDate, &film.Rating)
+		var releaseDatePG pgtype.Date
+		err := rows.Scan(&film.ID, &film.Title, &film.Description, &releaseDatePG, &film.Rating)
 		if err != nil {
 			return []models.Film{}, err
 		}
-		films = append(films, film)
-	}
-
-	rows.Close()
-	if err := rows.Err(); err != nil {
-		return []models.Film{}, err
-	}
-	return films, nil
-}
-
-func (fR *FilmRepository) GetFilmsSortedByTitle() ([]models.Film, error) {
-	transactionCtx := context.Background()
-	tx, err := fR.pool.Begin(transactionCtx)
-	if err != nil {
-		return []models.Film{}, err
-	}
-
-	defer func() {
-		switch err {
-		case nil:
-			err = tx.Commit(transactionCtx)
-		default:
-			_ = tx.Rollback(transactionCtx)
-		}
-	}()
-
-	films := []models.Film{}
-	rows, err := tx.Query(transactionCtx, filmQueries.GetFilmsSortedByTitle)
-	if err != nil {
-		return []models.Film{}, err
-	}
-
-	for rows.Next() {
-		film := models.Film{}
-		err := rows.Scan(&film.ID, &film.Title, &film.Description, &film.ReleaseDate, &film.Rating)
-		if err != nil {
-			return []models.Film{}, err
-		}
-		films = append(films, film)
-	}
-
-	rows.Close()
-	if err := rows.Err(); err != nil {
-		return []models.Film{}, err
-	}
-	return films, nil
-}
-
-func (fR *FilmRepository) GetFilmsSortedByDate() ([]models.Film, error) {
-	transactionCtx := context.Background()
-	tx, err := fR.pool.Begin(transactionCtx)
-	if err != nil {
-		return []models.Film{}, err
-	}
-
-	defer func() {
-		switch err {
-		case nil:
-			err = tx.Commit(transactionCtx)
-		default:
-			_ = tx.Rollback(transactionCtx)
-		}
-	}()
-
-	films := []models.Film{}
-	rows, err := tx.Query(transactionCtx, filmQueries.GetFilmsSortedByDate)
-	if err != nil {
-		return []models.Film{}, err
-	}
-
-	for rows.Next() {
-		film := models.Film{}
-		err := rows.Scan(&film.ID, &film.Title, &film.Description, &film.ReleaseDate, &film.Rating)
-		if err != nil {
-			return []models.Film{}, err
-		}
+		film.ReleaseDate = releaseDatePG.Time.Format(time.DateOnly)
 		films = append(films, film)
 	}
 
@@ -254,17 +190,59 @@ func (fR *FilmRepository) GetFilmsByTitle(title string) ([]models.Film, error) {
 	}()
 
 	films := []models.Film{}
-	rows, err := tx.Query(transactionCtx, filmQueries.GetFilmsByTitle)
+	rows, err := tx.Query(transactionCtx, filmQueries.GetFilmsByTitle, &title)
 	if err != nil {
 		return []models.Film{}, err
 	}
 
 	for rows.Next() {
 		film := models.Film{}
-		err := rows.Scan(&film.ID, &film.Title, &film.Description, &film.ReleaseDate, &film.Rating)
+		var releaseDatePG pgtype.Date
+		err := rows.Scan(&film.ID, &film.Title, &film.Description, &releaseDatePG, &film.Rating)
 		if err != nil {
 			return []models.Film{}, err
 		}
+		film.ReleaseDate = releaseDatePG.Time.Format(time.DateOnly)
+		films = append(films, film)
+	}
+
+	rows.Close()
+	if err := rows.Err(); err != nil {
+		return []models.Film{}, err
+	}
+	return films, nil
+}
+
+func (fR *FilmRepository) GetFilmsByActor(actorName string) ([]models.Film, error) {
+	transactionCtx := context.Background()
+	tx, err := fR.pool.Begin(transactionCtx)
+	if err != nil {
+		return []models.Film{}, err
+	}
+
+	defer func() {
+		switch err {
+		case nil:
+			err = tx.Commit(transactionCtx)
+		default:
+			_ = tx.Rollback(transactionCtx)
+		}
+	}()
+
+	films := []models.Film{}
+	rows, err := tx.Query(transactionCtx, filmQueries.GetFilmsByActor, &actorName)
+	if err != nil {
+		return []models.Film{}, err
+	}
+
+	for rows.Next() {
+		film := models.Film{}
+		var releaseDatePG pgtype.Date
+		err := rows.Scan(&film.ID, &film.Title, &film.Description, &releaseDatePG, &film.Rating)
+		if err != nil {
+			return []models.Film{}, err
+		}
+		film.ReleaseDate = releaseDatePG.Time.Format(time.DateOnly)
 		films = append(films, film)
 	}
 
